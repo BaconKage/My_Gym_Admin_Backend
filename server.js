@@ -42,6 +42,31 @@ app.get("/", (req, res) => {
   res.send("MyGym Admin Backend is running ✅");
 });
 
+// ---------- Allowed collections for explorer ----------
+const IMPORTANT_COLLECTIONS = [
+  "activities",
+  "activityfeeds",
+  "attendances",
+  "auditlogs",
+  "audittrails",
+  "blogs",
+  "bmrs",
+  "carts",
+  "certifications",
+  "challenges",
+  "challengesworks",
+  "chatmembers",
+  "commonpages",
+  "conversations",
+  "createmembershiptokens",
+  "dailysteps",
+  "exercisecategories",
+  "exerciselevels",
+  "exercises",
+  "exercisesubcategories",
+];
+
+// ---------- /api/meta : high-level counts ----------
 /**
  * GET /api/meta
  * High-level metadata: collections + document counts
@@ -65,33 +90,52 @@ app.get("/api/meta", async (req, res) => {
   }
 });
 
+// ---------- /api/collections/:name : paginated docs ----------
 /**
  * GET /api/collections/:name
- * Generic endpoint to view documents from any collection
- * Example: /api/collections/dailysteps?limit=20&skip=0
+ * Generic endpoint to view documents from allowed collections
+ * Example: /api/collections/dailysteps?page=1&limit=20
  */
 app.get("/api/collections/:name", async (req, res) => {
   try {
     const { name } = req.params;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = parseInt(req.query.skip) || 0;
+
+    // Only allow whitelisted collections
+    if (!IMPORTANT_COLLECTIONS.includes(name)) {
+      return res.status(400).json({ error: "Collection not allowed" });
+    }
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const skip = (page - 1) * limit;
 
     const db = mongoose.connection.db;
     const collection = db.collection(name);
 
-    const docs = await collection
-      .find({})
-      .skip(skip)
-      .limit(limit)
-      .toArray();
+    const [docs, total] = await Promise.all([
+      collection
+        .find({})
+        .sort({ _id: -1 }) // newest first
+        .skip(skip)
+        .limit(limit)
+        .toArray(),
+      collection.estimatedDocumentCount(),
+    ]);
 
-    res.json(docs);
+    res.json({
+      name,
+      page,
+      limit,
+      total,
+      docs,
+    });
   } catch (err) {
     console.error("Error in /api/collections/:name:", err);
     res.status(500).json({ error: "Failed to fetch documents" });
   }
 });
 
+// ---------- /api/dashboard : main cards stats ----------
 /**
  * GET /api/dashboard
  * Simple dashboard stats for your main cards
