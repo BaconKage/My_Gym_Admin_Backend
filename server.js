@@ -110,6 +110,7 @@ app.get("/api/meta", async (req, res) => {
 app.get("/api/collections/:name", async (req, res) => {
   try {
     const { name } = req.params;
+    console.log("Requested collection:", name);
 
     // Only allow whitelisted collections
     if (!IMPORTANT_COLLECTIONS.includes(name)) {
@@ -230,3 +231,4 @@ app.get("/api/dashboard", async (req, res) => {
  *  - /api/challenges/active
  * But for now, /api/collections/:name is enough.
  */
+
