@@ -163,6 +163,17 @@ app.get("/api/dashboard", async (req, res) => {
       challengesCount,
       cartsCount,
       conversationsCount,
+      usersCount,
+      gymsCount,
+      leadsCount,
+      gymAuditTrailsCount,
+      membershipsCount,
+      gymTrainerClassesCount,
+      freezedInfosCount,
+      foodsCount,
+      notificationsCount,
+      ticketsCount,
+      videoRoomsCount,
     ] = await Promise.all([
       db.collection("activities").estimatedDocumentCount().catch(() => 0),
       db.collection("dailysteps").estimatedDocumentCount().catch(() => 0),
@@ -170,15 +181,40 @@ app.get("/api/dashboard", async (req, res) => {
       db.collection("challenges").estimatedDocumentCount().catch(() => 0),
       db.collection("carts").estimatedDocumentCount().catch(() => 0),
       db.collection("conversations").estimatedDocumentCount().catch(() => 0),
+      db.collection("users").estimatedDocumentCount().catch(() => 0),
+      db.collection("gyms").estimatedDocumentCount().catch(() => 0),
+      db.collection("leads").estimatedDocumentCount().catch(() => 0),
+      db.collection("gymaudittrails").estimatedDocumentCount().catch(() => 0),
+      db.collection("memberships").estimatedDocumentCount().catch(() => 0),
+      db.collection("gymtrainerclasses").estimatedDocumentCount().catch(() => 0),
+      db.collection("freezedinfos").estimatedDocumentCount().catch(() => 0),
+      db.collection("foods").estimatedDocumentCount().catch(() => 0),
+      db.collection("notifications").estimatedDocumentCount().catch(() => 0),
+      db.collection("tickets").estimatedDocumentCount().catch(() => 0),
+      db.collection("videorooms").estimatedDocumentCount().catch(() => 0),
     ]);
 
     res.json({
+      // existing fields (used by current dashboard cards)
       totalActivities: activitiesCount,
       totalDailyStepsRecords: dailystepsCount,
       totalExercises: exercisesCount,
-      activeChallenges: challengesCount, // later can filter by status
+      activeChallenges: challengesCount,
       openCarts: cartsCount,
       totalConversations: conversationsCount,
+
+      // extra stats you can wire up later in UI
+      totalUsers: usersCount,
+      totalGyms: gymsCount,
+      totalLeads: leadsCount,
+      totalGymAuditTrails: gymAuditTrailsCount,
+      totalMemberships: membershipsCount,
+      totalGymTrainerClasses: gymTrainerClassesCount,
+      totalFreezedInfos: freezedInfosCount,
+      totalFoods: foodsCount,
+      totalNotifications: notificationsCount,
+      totalTickets: ticketsCount,
+      totalVideoRooms: videoRoomsCount,
     });
   } catch (err) {
     console.error("Error in /api/dashboard:", err);
@@ -194,4 +230,3 @@ app.get("/api/dashboard", async (req, res) => {
  *  - /api/challenges/active
  * But for now, /api/collections/:name is enough.
  */
-
