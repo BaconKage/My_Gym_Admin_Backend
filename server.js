@@ -64,6 +64,17 @@ const IMPORTANT_COLLECTIONS = [
   "exerciselevels",
   "exercises",
   "exercisesubcategories",
+  "users",
+  "gyms",
+  "leads",
+  "gymaudittrails",
+  "memberships",
+  "gymtrainerclasses",
+  "freezedinfos",
+  "foods",
+  "notifications",
+  "tickets",
+  "videorooms",
 ];
 
 // ---------- /api/meta : high-level counts ----------
@@ -183,3 +194,4 @@ app.get("/api/dashboard", async (req, res) => {
  *  - /api/challenges/active
  * But for now, /api/collections/:name is enough.
  */
+
